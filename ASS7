@@ -1,0 +1,91 @@
+// src/App.js
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "./App.css";
+
+function App() {
+  const [users, setUsers] = useState([]);         // data
+  const [loading, setLoading] = useState(true);   // loading state
+  const [error, setError] = useState(null);       // error state
+
+  useEffect(() => {
+    // start loading
+    setLoading(true);
+    setError(null);
+
+    axios
+      .get("https://jsonplaceholder.typicode.com/users")
+      .then((response) => {
+        setUsers(response.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Failed to fetch data. Please try again.");
+        setLoading(false);
+      });
+  }, []); // empty deps = run once on mount
+
+  if (loading) return <div className="status">Loading data...</div>;
+  if (error) return <div className="status error">{error}</div>;
+
+  return (
+    <div className="app">
+      <h1>Users (from API)</h1>
+      <ul className="user-list">
+        {users.map((u) => (
+          <li key={u.id} className="user-item">
+            <strong>{u.name}</strong>
+            <div className="small">{u.email} • {u.company?.name}</div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default App;
+
+/* src/App.css */
+.app {
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: 36px auto;
+  padding: 0 16px;
+  text-align: left;
+}
+
+h1 {
+  color: #1e3a8a;
+  text-align: center;
+}
+
+.status {
+  text-align: center;
+  font-size: 18px;
+  margin-top: 40px;
+}
+
+.status.error {
+  color: #c92a2a;
+}
+
+.user-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.user-item {
+  background: #f8fafc;
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.small {
+  font-size: 13px;
+  color: #555;
+  margin-top: 6px;
+}
