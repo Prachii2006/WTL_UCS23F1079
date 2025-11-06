@@ -1,0 +1,333 @@
+//App.css
+.container {
+  max-width: 400px;
+  margin: 50px auto;
+  background: #f7f7ff;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin: 10px 0 5px;
+  font-weight: bold;
+}
+
+input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #1e90ff;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #005cbf;
+}
+
+.counter {
+  text-align: center;
+  margin-top: 15px;
+  color: #444;
+}
+
+.submitted-data {
+  margin-top: 20px;
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.submitted-data ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.submitted-data li {
+  background-color: #eaf1ff;
+  padding: 8px;
+  margin-bottom: 5px;
+  border-radius: 6px;
+}
+
+
+//App.jsx
+import React, { useState } from "react";
+import "./App.css";
+
+function App() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const [submittedData, setSubmittedData] = useState([]);
+  const [submitCount, setSubmitCount] = useState(0);
+
+  // For handling typing in inputs
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  // For handling submit
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Basic validation
+    if (!formData.name || !formData.email || !formData.password) {
+      alert("Please fill all fields before submitting!");
+      return;
+    }
+
+    // Email format validation
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(formData.email)) {
+      alert("Please enter a valid email address!");
+      return;
+    }
+
+    // Add data to submitted list
+    setSubmittedData([...submittedData, formData]);
+
+    // Increase count
+    setSubmitCount(submitCount + 1);
+
+    // Clear form
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+    });
+  };
+
+  return (
+    <div className="container">
+      <h1>Registration Form</h1>
+
+      <form onSubmit={handleSubmit}>
+        <label>Name:</label>
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Enter your name"
+        />
+
+        <label>Email:</label>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="Enter your email"
+        />
+
+        <label>Password:</label>
+        <input
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+          placeholder="Enter your password"
+        />
+
+        <button type="submit">Submit</button>
+      </form>
+
+      <h3 className="counter">
+        Form Submitted: {submitCount} {submitCount === 1 ? "time" : "times"}
+      </h3>
+
+      {submittedData.length > 0 && (
+        <div className="submitted-data">
+          <h2>Submitted Data</h2>
+          <ul>
+            {submittedData.map((data, index) => (
+              <li key={index}>
+                <strong>{data.name}</strong> ({data.email})
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
+
+//Form.jsx
+import React, { useState } from 'react'
+
+function Form() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: ''
+  })
+  const [errors, setErrors] = useState({})
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  const validate = () => {
+    let newErrors = {}
+    if (!formData.name) newErrors.name = 'Name is required'
+    if (!formData.email) newErrors.email = 'Email is required'
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = 'Email is invalid'
+    if (!formData.password) newErrors.password = 'Password is required'
+    return newErrors
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const validationErrors = validate()
+    if (Object.keys(validationErrors).length === 0) {
+      alert('Registration Successful!')
+    } else {
+      setErrors(validationErrors)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>Name:</label>
+      <input
+        type="text"
+        name="name"
+        value={formData.name}
+        onChange={handleChange}
+      />
+      {errors.name && <p className="error">{errors.name}</p>}
+
+      <label>Email:</label>
+      <input
+        type="email"
+        name="email"
+        value={formData.email}
+        onChange={handleChange}
+      />
+      {errors.email && <p className="error">{errors.email}</p>}
+
+      <label>Password:</label>
+      <input
+        type="password"
+        name="password"
+        value={formData.password}
+        onChange={handleChange}
+      />
+      {errors.password && <p className="error">{errors.password}</p>}
+
+      <button type="submit" className="submit-btn">Submit</button>
+    </form>
+  )
+}
+
+export default Form
+
+//index.css
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+//main.jsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './App.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
