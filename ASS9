@@ -1,0 +1,88 @@
+//index.html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student API</title>
+</head>
+<body>
+  <h1>Welcome to Student API Server</h1>
+  <p>Use Postman to test RESTful routes.</p>
+</body>
+</html>
+
+//sever.js
+// Import express
+const express = require("express");
+const app = express();
+const PORT = 3000;
+
+// Middleware
+app.use(express.json()); // To parse JSON data
+app.use(express.static("public")); // To serve static files
+
+// Sample student data (in-memory)
+let students = [
+  { id: 1, name: "Prachi", age: 18, course: "Computer Engineering" },
+  { id: 2, name: "Sanskruti", age: 19, course: "IT" },
+];
+
+// ---------------------- BASIC ROUTES ----------------------
+
+// Home route
+app.get("/", (req, res) => {
+  res.send("Welcome to the Student API Server!");
+});
+
+// JSON route
+app.get("/data", (req, res) => {
+  res.json({ message: "This is sample JSON data", success: true });
+});
+
+// ---------------------- RESTful API ----------------------
+
+// GET all students
+app.get("/api/students", (req, res) => {
+  res.json(students);
+});
+
+// GET single student by ID
+app.get("/api/students/:id", (req, res) => {
+  const student = students.find(s => s.id === parseInt(req.params.id));
+  if (!student) return res.status(404).send("Student not found!");
+  res.json(student);
+});
+
+// POST (Add new student)
+app.post("/api/students", (req, res) => {
+  const newStudent = {
+    id: students.length + 1,
+    name: req.body.name,
+    age: req.body.age,
+    course: req.body.course,
+  };
+  students.push(newStudent);
+  res.status(201).json(newStudent);
+});
+
+// PUT (Update existing student)
+app.put("/api/students/:id", (req, res) => {
+  const student = students.find(s => s.id === parseInt(req.params.id));
+  if (!student) return res.status(404).send("Student not found!");
+
+  student.name = req.body.name;
+  student.age = req.body.age;
+  student.course = req.body.course;
+
+  res.json(student);
+});
+
+// DELETE (Remove a student)
+app.delete("/api/students/:id", (req, res) => {
+  students = students.filter(s => s.id !== parseInt(req.params.id));
+  res.json({ message: "Student deleted successfully!" });
+});
+
+// ---------------------- START SERVER ----------------------
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+});
