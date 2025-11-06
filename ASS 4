@@ -1,0 +1,105 @@
+<?php
+// --- Database Connection ---
+$conn = new mysqli("localhost", "root", "", "studentdb");
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// --- Handle Insert Request ---
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["action"] === "insert") {
+    $name = $_POST["studentname"];
+    $marks = $_POST["studentmarks"];
+
+    $stat = $conn->prepare("INSERT INTO student (studentname, studentmarks) VALUES (?, ?)");
+    $stat->bind_param("si", $name, $marks);
+
+    if ($stat->execute()) {
+        echo "Data inserted successfully!";
+    } else {
+        echo "Error during insertion: " . $conn->error;
+    }
+
+    $conn->close();
+    exit;
+}
+
+// --- Handle Delete Request ---
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["action"]) && $_POST["action"] === "delete") {
+    $name = $_POST["studentname"];
+
+    $stat = $conn->prepare("DELETE FROM student WHERE studentname = ?");
+    $stat->bind_param("s", $name);
+
+    if ($stat->execute()) {
+        if ($stat->affected_rows > 0) {
+            echo "Record deleted successfully!";
+        } else {
+            echo "No record found with that name.";
+        }
+    } else {
+        echo "Error during deletion: " . $conn->error;
+    }
+
+    $conn->close();
+    exit;
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insert/Delete Student</title>
+</head>
+<body>
+    <h2>Insert / Delete Student Record</h2>
+
+    <div>
+        <form id="studentForm">
+            <label>Enter Student Name:</label>
+            <input type="text" id="id1" name="studentname" required><br><br>
+
+            <label>Enter Student Marks:</label>
+            <input type="text" id="id2" name="studentmarks"><br><br>
+
+            <button type="button" id="insertBtn">Insert</button>
+            <button type="button" id="deleteBtn">Delete</button>
+        </form>
+    </div>
+
+    <script>
+        // Function to send insert or delete request
+        async function handleRequest(actionType) {
+            let name = document.getElementById("id1").value.trim();
+            let marks = document.getElementById("id2").value.trim();
+
+            if (name === "") {
+                alert("Please enter the student name!");
+                return;
+            }
+
+            // Create form data
+            let formData = new FormData();
+            formData.append("studentname", name);
+            formData.append("studentmarks", marks);
+            formData.append("action", actionType);
+
+            // Send request to same PHP file
+            let response = await fetch("student.php", {
+                method: "POST",
+                body: formData
+            });
+
+            let data = await response.text();
+            alert(data);
+            console.log(data);
+        }
+
+        // Button actions
+        document.getElementById("insertBtn").addEventListener("click", () => handleRequest("insert"));
+        document.getElementById("deleteBtn").addEventListener("click", () => handleRequest("delete"));
+    </script>
+</body>
+</html>
