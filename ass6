@@ -1,0 +1,46 @@
+//App.js
+import React, { useState } from "react";
+import Student from "./Student";
+
+function App() {
+  // useState hook to manage state
+  const [marks, setMarks] = useState(85);
+
+  // function to update marks
+  const updateMarks = () => {
+    setMarks(marks + 5);
+  };
+
+  return (
+    <div style={{ textAlign: "center", marginTop: "50px" }}>
+      <h2>🎓 Student Information</h2>
+      {/* passing data to child using props */}
+      <Student name="Prachi Lahoti" college="Sanjivani College of Engineering" marks={marks} />
+      
+      <button onClick={updateMarks} style={{ marginTop: "20px", padding: "10px 15px" }}>
+        Increase Marks
+      </button>
+    </div>
+  );
+}
+
+export default App;
+
+//Student.js
+import React from "react";
+
+function Student(props) {
+  return (
+    <div style={
+        { 
+            border: "2px solid gray", padding: "20px", borderRadius: "10px", display: "inline-block" 
+            }
+            }>
+      <h3>Name: {props.name}</h3>
+      <p>College: {props.college}</p>
+      <p>Marks: {props.marks}</p>
+    </div>
+  );
+}
+
+export default Student;
